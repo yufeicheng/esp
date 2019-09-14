@@ -1,0 +1,73 @@
+//put miranda/kerr/_mapping
+{
+  "kerr": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ik_smart"
+      },
+      "name": {
+        "properties": {
+          "first": {
+            "type": "text",
+            "analyzer": "ik_smart",
+            "copy_to": "full_name"
+          },
+          "last": {
+            "type": "text",
+            "analyzer": "ik_smart",
+            "copy_to": "full_name"
+          },
+          "full_name": {
+            "type": "text",
+            "analyzer": "ik_smart"
+          }
+        }
+      },
+      "votes": {
+        "type": "integer"
+      },
+      "city": {
+        "type": "text",
+        "analyzer": "ik_smart",
+        "fields": {
+          "raw": {
+            "type": "keyword"
+          }
+        }
+      },
+      "features": {
+        "type": "text",
+        "analyzer": "ik_smart"
+      },
+      "price": {
+        "type": "float"
+      },
+      "color": {
+        "type": "keyword"
+      },
+      "employees": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "ik_smart"
+          }
+        }
+      },
+      "publishtime": {
+        "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis",
+        "type": "date"
+      }
+    }
+  }
+}

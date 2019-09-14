@@ -1,0 +1,16 @@
+spring:
+  redis:
+    host: 39.106.118.71
+    password:
+    port: 6380
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      username: chengyufei
+      password: 123456
+      url: jdbc:mysql://39.106.118.71:3306/test
+      default-auto-commit: true
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml

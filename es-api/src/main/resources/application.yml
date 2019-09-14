@@ -1,0 +1,25 @@
+server:
+  port: 9091
+  maxPostSize: 0
+
+spring:
+  application.name: search
+  profiles.active: dev
+  data:
+    elasticsearch:
+      cluster-name: taylor
+      cluster-nodes: 39.106.118.71:9300
+      repositories:
+        enabled: true
+#而当我们需要使用CGLIB来实现AOP的时候，需要配置 spring.aop.proxy-target-class=true ，不然默认使用的是标准Java的实现
+spring.aop.proxy-target-class: true
+
+---
+spring.profiles: dev
+spring.profiles.include: dao-dev
+
+
+
+
+
+

@@ -1,0 +1,4 @@
+# Project exclude paths
+/es-api/target/
+/es-base/target/
+/es-dao/target/

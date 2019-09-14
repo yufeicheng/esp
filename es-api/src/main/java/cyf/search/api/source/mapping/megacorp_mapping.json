@@ -1,0 +1,25 @@
+{
+  "megacorp": {
+    "mappings": {
+      "employee": {
+        "properties": {
+          "about": {
+            "type": "string"
+          },
+          "age": {
+            "type": "long"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "interests": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

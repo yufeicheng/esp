@@ -1,0 +1,34 @@
+{
+  "size" : 0,
+  "query" : {
+    "match" : {
+      "city" : {
+        "query" : "美国",
+        "operator" : "OR",
+        "prefix_length" : 0,
+        "max_expansions" : 50,
+        "fuzzy_transpositions" : true,
+        "lenient" : false,
+        "zero_terms_query" : "NONE",
+        "boost" : 1.0
+      }
+    }
+  },
+  "aggregations" : {
+    "global" : {
+      "global" : { },
+      "aggregations" : {
+        "globalAvg" : {
+          "avg" : {
+            "field" : "votes"
+          }
+        }
+      }
+    },
+    "cityavg" : {
+      "avg" : {
+        "field" : "votes"
+      }
+    }
+  }
+}

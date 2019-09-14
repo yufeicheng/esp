@@ -1,0 +1,840 @@
+GET candice/user/_search
+{
+  "from": 0,
+  "size": 1,
+  "query": {
+    "match_all": {}
+  }
+}
+
+get candice/user/_mapping
+
+GET  /_cat/indices
+
+
+
+#关注: ugcindex/concern
+PUT /ugcindex
+
+put ugcindex/concern/_mapping
+{
+"properties":{
+"contentType": {
+"type": "string",
+"index":"not_analyzed",
+"store": true
+},
+"ctime": {
+"type": "long",
+"store": true
+},
+"hasBuy": {
+"type": "boolean"
+},
+"id": {
+"type": "long",
+"store": true
+},
+"linkUrl": {
+"type": "string"
+},
+"mainContent": {
+"type": "string",
+"store": true,
+"analyzer":"ik_smart",
+"include_in_all": true
+},
+"pic": {
+"type": "string"
+},
+"price": {
+"type":"long"
+},
+"pubDate": {
+"type": "date",
+"store": true,
+"format": "yyyyMMdd"
+},
+"pubTime": {
+"type": "date",
+"store": true,
+"format": "yyyyMMddHHmmss"
+},
+"riseDrop": {
+"type":"long"
+},
+"sourceId": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"stocks": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"subContent": {
+"type":"string",
+"store": true,
+"analyzer": "ik_smart",
+"include_in_all": true
+},
+"subId": {
+"type":"long",
+"store": true
+},
+"subType": {
+"type": "long"
+},
+"user": {
+"properties":{
+"city": {
+"type": "string",
+"index":"not_analyzed"
+},
+"company": {
+"type": "string",
+"index": "not_analyzed"
+},
+"growupVal": {
+"type":"integer"
+},
+"headImage": {
+"type": "string",
+"index": "not_analyzed"
+},
+"intro": {
+"type":"string"
+},
+"isAdviser": {
+"type": "integer"
+},
+"level": {
+"type": "integer"
+},
+"passportName": {
+"type": "string",
+"index": "not_analyzed"
+},
+"position": {
+"type": "string",
+"index":"not_analyzed"
+},
+"province": {
+"type": "string",
+"index": "not_analyzed"
+},
+"relationStatus": {
+"type":"integer"
+},
+"signV": {
+"type": "integer"
+},
+"type": {
+"type": "integer"
+},
+"typeDesc": {
+"type": "string",
+"index": "not_analyzed"
+},
+"userId": {
+"type": "string",
+"index":"not_analyzed"
+},
+"userName": {
+"type": "string",
+"index": "not_analyzed"
+}
+}
+},
+"userId": {
+"type": "string",
+"index": "not_analyzed",
+"store":true
+},
+"userName": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+}
+}
+}
+
+GET ugcindex/concern/_mapping
+
+put ugcindex/concern/answer_2884
+{
+"contentType": "answer",
+"ctime": 1492757010365,
+"id": 2884,
+"mainContent": "你好，目前分析看涨啊$深天地A(000023)$",
+"pubDate": "20170421",
+"pubTime": "20170421144330",
+"riseDrop": 1,
+"sourceId": "answer_2884",
+"stocks":[
+"深天地A|000023"
+],
+"subContent": "深天地A(000023)",
+"subId": 4767,
+"user": {
+"city": "天津",
+"company": "安信证券",
+"growupVal": 1,
+"headImage": "http://itg1.jrjimg.cn/201501/24/itougu/itougu_14220963126671.jpg",
+"intro":"我认为今天商人要寻找一个机会，今天就能做，今天做明天就有成功的机会，基本没有，因为这个世界聪明人太多了，你只能比未来，我认为十年以后中国社会会出现这样的事情，我必须去做!OOK11111shuyujingerfengbuzhilixiaoyu",
+"isAdviser": 1,
+"level": 1,
+"passportName": "tgtest1",
+"province": "天津",
+"relationStatus":0,
+"signV": 1,
+"type": 1,
+"typeDesc": "财经名人",
+"userId": "141120010079383950",
+"userName":"cat华清"
+},
+"userId": "141120010079383950",
+"userName": "cat华清"
+}
+
+GET ugcindex/concern/_search
+{
+"from": 0,
+"size": 1,
+"query": {
+"match_all": {}
+}
+}
+
+post ugcindex/concern/answer_2884/_update
+{
+"doc": {
+"pubDate": "20190806"
+}
+}
+
+GET ugcindex/concern/_search
+{
+"size": 1,
+"query" : {
+"bool": {
+"filter": [
+{
+"range": {
+"pubDate": {
+"from": "20190723",
+"to": "20190806",
+"include_lower": true,
+"include_upper" : true,
+"boost": 1.0
+}
+}
+}
+],
+"should": [
+{
+"terms": {
+"userId": [
+"150106010008993769"
+],
+"boost": 1.0
+}
+}
+],
+"disable_coord": false,
+"adjust_pure_negative": true,
+"boost" : 1.0
+}
+},
+"explain": false,
+"_source" : {
+"includes": [],
+"excludes": [
+"content"
+]
+},
+"sort": [
+{
+"ctime": {
+"order": "desc"
+}
+}
+]
+}
+
+GET ugcindex/concern/viewPoint_5
+
+
+
+
+#股友圈: stockcircle/comment
+PUT stockcircle/comment/_mapping
+{
+"properties": {
+"bizType": {
+"type": "long"
+},
+"content": {
+"type": "string"
+},
+"ctime": {
+"type": "long"
+},
+"id": {
+"type": "string"
+},
+"stockId": {
+"type":"string"
+},
+"stockName": {
+"type": "string"
+},
+"subType": {
+"type": "long"
+},
+"userId": {
+"type": "string"
+},
+"userName": {
+"type": "string"
+}
+}
+}
+
+GET stockcircle/comment/_mapping
+
+
+
+# ask：ugcindex/ask
+put ugcindex/ask/_mapping
+{
+"properties": {
+"answeredTimes":{
+"type": "integer",
+"store": true
+},
+"answeredUids": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"content": {
+"type": "string",
+"store": true,
+"analyzer": "ik_smart",
+"include_in_all": true
+},
+"ctime": {
+"type": "long",
+"store": true
+},
+"dirUserId":{
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"id": {
+"type": "long",
+"store": true
+},
+"ip": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"isOpen": {
+"type": "integer",
+"store": true
+},
+"pubDate": {
+"type": "date",
+"store": true,
+"format": "yyyyMMdd"
+},
+"pubTime": {
+"type": "date",
+"store": true,
+"format": "yyyyMMddHHmmss"
+},
+"source": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"status": {
+"type": "integer",
+"store": true
+},
+"stocks": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"type": {
+"type": "integer",
+"store": true
+},
+"user": {
+"properties": {
+"city":{
+"type": "string",
+"index": "not_analyzed"
+},
+"company": {
+"type": "string",
+"index": "not_analyzed"
+},
+"growupVal": {
+"type": "integer"
+},
+"headImage": {
+"type": "string",
+"index": "not_analyzed"
+},
+"intro": {
+"type": "string"
+},
+"isAdviser": {
+"type": "integer"
+},
+"level":{
+"type": "integer"
+},
+"nickName": {
+"type": "string"
+},
+"passportName": {
+"type": "string",
+"index": "not_analyzed"
+},
+"position": {
+"type": "string",
+"index": "not_analyzed"
+},
+"province":{
+"type": "string",
+"index": "not_analyzed"
+},
+"relationStatus": {
+"type": "integer"
+},
+"signV":{
+"type": "integer"
+},
+"type": {
+"type": "integer"
+},
+"typeDesc": {
+"type": "string",
+"index": "not_analyzed"
+},
+"userId": {
+"type": "string",
+"index": "not_analyzed"
+},
+"userName":{
+"type": "string",
+"index": "not_analyzed"
+}
+}
+},
+"userId": {
+"type": "string",
+"index": "not_analyzed",
+"store": true
+},
+"userName":{
+"type": "string",
+"index": "not_analyzed",
+"store": true
+}
+}
+}
+
+GET ugcindex/ask/_search
+{
+"from": 0,
+"size": 5,
+"query": {
+"match_all": {
+}
+}
+}
+
+put ugcindex/ask/4785
+{
+"answeredTimes":0,
+"answeredUids":[
+],
+"content": "上证指数(000001)",
+"ctime": 1493175059449,
+"dirUserId": "null",
+"id": 4785,
+"ip": "10.66.42.147",
+"isOpen": 1,
+"pubDate": "20170426",
+"pubTime": "20170426105059",
+"source": "IOS",
+"status": 1,
+"stocks":[
+"平安银行|000001"
+],
+"type": 1,
+"user": {
+"headImage":"http://i5.jrjimg.cn/201703/27/hp/hp_14906146525241_m.jpg",
+"isAdviser": 0,
+"nickName": "tgtest7",
+"passportName": "tgtest7",
+"relationStatus": 0,
+"userId":"141128010036369236",
+"userName": "tgtest7"
+},
+"userId": "141128010036369236",
+"userName": "tgtest7"
+}
+
+GET ugcindex/ask/4780
+
+POST ugcindex/ask/4766/_update
+{
+"doc": {
+"stocks": []
+}
+}
+GET ugcindex/ask/_search
+{
+"query": {
+"match_all": {
+"boost": 1.0
+}
+},
+"aggregations": {
+"by_stocks": {
+"terms": {
+"field": "stocks",
+"size": 20,
+"shard_size": 1000,
+"min_doc_count": 1,
+"shard_min_doc_count": 0,
+"show_term_doc_count_error": false,
+"order": [
+{
+"_count": "desc"
+},
+{
+"_term": "asc"
+}
+]
+}
+}
+}
+}
+
+GET ugcindex/ask/_search
+{
+"from": 0,
+"size": 10,
+"query": {
+"filtered": {
+"query": {
+"bool": {
+"should": {
+"terms": {
+"isOpen": 1
+}
+}
+}
+},
+"filter": {
+"query": {
+"bool": {
+"must": {
+"range": {
+"pubDate": {
+"from" : "20150114",
+"to": "20160114",
+"include_lower": true,
+"include_upper": true
+}
+}
+}
+}
+}
+}
+}
+},
+"explain": false,
+"_source": {
+"includes": [],
+"excludes": ["content"]
+},
+"sort": [
+{
+"ctime": {
+"order": "desc"
+}
+}
+]
+}
+
+
+#  ugcindex/stockcon
+
+put ugcindex2
+
+PUT ugcindex2/stockcon/_mapping
+{
+"properties":{
+"contentLength": {
+"type": "long"
+},
+"contentType": {
+"type": "keyword"
+},
+"ctime": {
+"type": "long"
+},
+"id": {
+"type":"long"
+},
+"linkUrl": {
+"type": "text"
+},
+"mainContent": {
+"type": "keyword"
+},
+"pic": {
+"type": "keyword"
+},
+"pubDate": {
+"type": "keyword"
+},
+"pubTime": {
+"type":"keyword"
+},
+"replyContent": {
+"type": "text"
+},
+"replyUserId": {
+"type": "keyword"
+},
+"replyUserName": {
+"type": "keyword"
+},
+"riseDrop": {
+"type": "long"
+},
+"sourceId": {
+"type":"keyword"
+},
+"stockCode": {
+"type": "keyword"
+},
+"stockName": {
+"type": "keyword"
+},
+"stocks": {
+"type": "keyword"
+},
+"subContent": {
+"type": "text"
+},
+"subId": {
+"type":"long"
+},
+"subType": {
+"type": "long"
+},
+"user": {
+"properties": {
+"city": {
+"type": "keyword"
+},
+"company": {
+"type":"keyword"
+},
+"growupVal": {
+"type": "long"
+},
+"headImage": {
+"type": "text"
+},
+"intro": {
+"type": "keyword"
+},
+"isAdviser": {
+"type": "long"
+},
+"level": {
+"type":"long"
+},
+"passportName": {
+"type": "keyword"
+},
+"position": {
+"type": "keyword"
+},
+"province": {
+"type": "keyword"
+},
+"relationStatus": {
+"type": "long"
+},
+"signV": {
+"type":"long"
+},
+"type": {
+"type": "long"
+},
+"typeDesc": {
+"type": "keyword"
+},
+"userId": {
+"type": "keyword"
+},
+"userName": {
+"type": "keyword"
+}
+}
+},
+"userId": {
+"type": "keyword"
+},
+"userName": {
+"type":"string"
+}
+}
+}
+
+GET ugcindex2/stockcon/_mapping
+
+PUT ugcindex2/stockcon/s_liveView_7573
+{
+"contentType": "liveView",
+"ctime": 1505206380000,
+"id": 7573,
+"mainContent": "000001哈哈 测试数据 请忽略",
+"pic": "http://itg1.jrjimg.cn/201709/12/itougu/itougu_15052063784881.jpg",
+"pubDate": "20170912",
+"pubTime": "20170912165300",
+"sourceId": "s_liveView_7573",
+"stockCode": "000001",
+"stockName": "平安银行",
+"subContent": "cat华清的直播室",
+"subId": 15,
+"user": {
+"city": "天津",
+"company": "安信证券",
+"growupVal": 1,
+"headImage": "http://itg1.jrjimg.cn/201501/24/itougu/itougu_14220963126671.jpg",
+"intro": "1",
+"isAdviser": 1,
+"level": 1,
+"passportName": "tgtest1",
+"province": "天津",
+"relationStatus": 0,
+"signV": 1,
+"type": 1,
+"typeDesc": "财经名人",
+"userId": "141120010079383950",
+"userName": "cat华清"
+},
+"userId": "141120010079383950",
+"userName": "cat华清"
+}
+
+GET ugcindex2/stockcon/_search
+{
+"query": {"match_all": {}}
+}
+
+GET ugcindex2/stockcon/_search
+{
+"size": 0,
+"query": {
+"bool": {
+"filter": [
+{
+"range": {
+"pubDate": {
+"from": "20190804",
+"to": "20190807",
+"include_lower": true,
+"include_upper" : true,
+"boost": 1.0
+}
+}
+}
+],
+"should": [
+{
+"terms": {
+"stocks": [
+"002064",
+"000002",
+"000001"
+],
+"boost": 1.0
+}
+}
+],
+"disable_coord": false,
+"adjust_pure_negative": true,
+"boost" : 1.0
+}
+},
+"explain": false,
+"aggregations" : {
+"by_stocks": {
+"terms": {
+"field": "stockCode",
+"size": 10,
+"min_doc_count": 1,
+"shard_min_doc_count": 0,
+"show_term_doc_count_error": false,
+"order": [
+{
+"maxValue": "desc"
+},
+{
+"_term": "asc"
+}
+]
+},
+"aggregations": {
+"top_hits_source": {
+"top_hits": {
+"from": 0,
+"size": 1,
+"version" : false,
+"explain": false,
+"_source": {
+"includes": [],
+"excludes": []
+},
+"sort": [
+{
+"id": {
+"order": "desc"
+}
+},
+{
+"ctime": {
+"order": "desc"
+}
+}
+]
+}
+},
+"maxValue": {
+"max": {
+"field": "id"
+}
+}
+}
+}
+}
+}
+
+

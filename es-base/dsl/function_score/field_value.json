@@ -1,0 +1,33 @@
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "terms": {
+          "title": [
+            "兰博基尼",
+            "法拉利"
+          ],
+          "boost": 1.0
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "match_all": {
+              "boost": 1.0
+            }
+          },
+          "field_value_factor": {
+            "field": "votes",
+            "factor": 1.0,
+            "modifier": "square"
+          }
+        }
+      ],
+      "score_mode": "multiply",
+      "boost_mode": "sum",
+      "max_boost": 3.4028235E38,
+      "boost": 1.0
+    }
+  }
+}

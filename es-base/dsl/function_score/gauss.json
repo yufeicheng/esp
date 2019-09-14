@@ -1,0 +1,33 @@
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {
+          "boost": 1.0
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "match_all": {
+              "boost": 1.0
+            }
+          },
+          "gauss": {
+            "votes": {
+              "origin": 10,
+              "scale": 5,
+              "offset": 1,
+              "decay": 0.5
+            },
+            "multi_value_mode": "MIN"
+          }
+        }
+      ],
+      "score_mode": "multiply",
+      "boost_mode": "sum",
+      "max_boost": 3.4028235E38,
+      "boost": 1.0
+    }
+  }
+}

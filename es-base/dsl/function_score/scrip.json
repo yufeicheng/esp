@@ -1,0 +1,30 @@
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {
+          "boost": 1.0
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "match_all": {
+              "boost": 1.0
+            }
+          },
+          "script_score": {
+            "script": {
+              "inline": "doc['price'].value / 1000 * doc['votes'].value",
+              "lang": "painless"
+            }
+          }
+        }
+      ],
+      "score_mode": "multiply",
+      "boost_mode": "sum",
+      "max_boost": 3.4028235E38,
+      "boost": 1.0
+    }
+  }
+}

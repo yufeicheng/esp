@@ -1,0 +1,214 @@
+{
+  "index": {
+    "_index": "ugcindex",
+    "_type": "ask"
+  }
+}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "深天地A(000023)",
+"ctime": 1492756876160,
+"dirUserId": "141120010079383950",
+"id": 4766,
+"ip": "10.66.42.54",
+"isOpen": 2,
+"pubDate": "20170421",
+"pubTime": "20170421144116",
+"source": "android",
+"status": 99,
+"stocks":[
+"深天地A|000023"
+],
+"type": 1,
+"user": {
+"headImage":"http://i5.jrjimg.cn/sys/default_m.jpg",
+"isAdviser": 0,
+"nickName": "萌娃娃1",
+"passportName": "财友9buh5568",
+"relationStatus": 0,
+"userId":"170421010081012557",
+"userName": "萌娃娃1"
+},
+"userId": "170421010081012557",
+"userName": "财友9buh5568"
+}
+{
+"index": {
+"_index": "ugcindex", "_type": "ask"}}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "上证50(000016)",
+"ctime": 1492854200663,
+"dirUserId": "null",
+"id": 4773,
+"ip": "10.66.42.115",
+"isOpen": 1,
+"pubDate": "20170422",
+"pubTime": "20170422174320",
+"source": "android",
+"status": 1,
+"stocks":[
+"深康佳A|000016"
+],
+"type": 1,
+"user": {
+"city":"天津",
+"company": "安信证券",
+"growupVal": 1,
+"headImage": "http://itg1.jrjimg.cn/201501/24/itougu/itougu_14220963126671.jpg",
+"intro": "我认为今天商人要寻找一个机会，今天就能做，今天做明天就有成功的机会，基本没有，因为这个世界聪明人太多了，你只能比未来，我认为十年以后中国社会会出现这样的事情，我必须去做!OOK11111shuyujingerfengbuzhilixiaoyu",
+"isAdviser":1,
+"level": 1,
+"passportName": "tgtest1",
+"province": "天津",
+"relationStatus": 0,
+"signV":1,
+"type": 1,
+"typeDesc": "财经名人",
+"userId": "141120010079383950",
+"userName": "cat华清"
+},
+"userId": "141120010079383950",
+"userName": "cat华清"
+}
+{
+"index":{"_index": "ugcindex", "_type": "ask"}}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "电话回访干活呢呢",
+"ctime": 1493110356002,
+"dirUserId": "null",
+"id": 4780,
+"ip": "10.66.42.115",
+"isOpen": 1,
+"pubDate": "20170425",
+"pubTime": "20170425165236",
+"source": "android",
+"status": 1,
+"stocks":[
+],
+"type": 1,
+"user": {
+"city":"天津",
+"company": "安信证券",
+"growupVal": 1,
+"headImage": "http://itg1.jrjimg.cn/201501/24/itougu/itougu_14220963126671.jpg",
+"intro": "我认为今天商人要寻找一个机会，今天就能做，今天做明天就有成功的机会，基本没有，因为这个世界聪明人太多了，你只能比未来，我认为十年以后中国社会会出现这样的事情，我必须去做!OOK11111shuyujingerfengbuzhilixiaoyu",
+"isAdviser":1,
+"level": 1,
+"passportName": "tgtest1",
+"province": "天津",
+"relationStatus": 0,
+"signV":1,
+"type": 1,
+"typeDesc": "财经名人",
+"userId": "141120010079383950",
+"userName": "cat华清"
+},
+"userId": "141120010079383950",
+"userName": "cat华清"
+}
+{
+"index":{"_index": "ugcindex", "_type": "ask"}}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "哈哈哈哈哈哈哈哈哈哈哈哈(⊙o⊙)…(⊙o⊙)…(⊙o⊙)…(⊙o⊙)…(⊙o⊙)…(⊙o⊙)…上证指数(000001)",
+"ctime": 1493101530456,
+"dirUserId": "null",
+"id": 4778,
+"ip": "10.66.42.54",
+"isOpen": 1,
+"pubDate": "20170425",
+"pubTime": "20170425142530",
+"source": "android",
+"status": 1,
+"stocks":[
+"平安银行|000001"
+],
+"type": 1,
+"user": {
+"headImage":"http://i5.jrjimg.cn/sys/default_m.jpg",
+"isAdviser": 0,
+"nickName": "此处我想吟诗一首",
+"passportName": "财友0b0uv925",
+"relationStatus": 0,
+"userId":"170424010023312005",
+"userName": "此处我想吟诗一首"
+},
+"userId": "170424010023312005",
+"userName": "此处我想吟诗一首"
+}
+{
+"index": {
+"_index": "ugcindex", "_type": "ask"}}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "回电话减肥万科A(000002)",
+"ctime": 1493258685432,
+"dirUserId": "141120010079383950",
+"id": 4792,
+"ip": "10.66.42.75",
+"isOpen": 2,
+"pubDate": "20170427",
+"pubTime": "20170427100445",
+"source": "android",
+"status": 99,
+"stocks":[
+"万科A|000002"
+],
+"type": 1,
+"user": {
+"headImage":"http://i5.jrjimg.cn/sys/default_m.jpg",
+"isAdviser": 0,
+"nickName": "财友m4pm5643",
+"passportName": "财友m4pm5643",
+"relationStatus": 0,
+"userId":"170426010021894226",
+"userName": "财友m4pm5643"
+},
+"userId": "170426010021894226",
+"userName": "财友m4pm5643"
+}
+{
+"index": {
+"_index": "ugcindex", "_type": "ask"}}\n
+{
+"answeredTimes": 0,
+"answeredUids":[
+],
+"content": "上证指数(000001)",
+"ctime": 1493175059449,
+"dirUserId": "null",
+"id": 4785,
+"ip": "10.66.42.147",
+"isOpen": 1,
+"pubDate": "20170426",
+"pubTime": "20170426105059",
+"source": "IOS",
+"status": 1,
+"stocks":[
+"平安银行|000001"
+],
+"type": 1,
+"user": {
+"headImage":"http://i5.jrjimg.cn/201703/27/hp/hp_14906146525241_m.jpg",
+"isAdviser": 0,
+"nickName": "tgtest7",
+"passportName": "tgtest7",
+"relationStatus": 0,
+"userId":"141128010036369236",
+"userName": "tgtest7"
+},
+"userId": "141128010036369236",
+"userName": "tgtest7"
+}

@@ -1,0 +1,46 @@
+###test
+GET {{url}}/test/sendMq
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/getById/5327
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/getAsk
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/update/ugcindex/ask/4780
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/getByAgg
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/getAskWeb
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/bulkAdd
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/delete
+Accept: */*
+Cache-Control: no-cache
+
+###
+GET {{url}}/test/searchSBUserByInfo/455000
+Accept: */*
+Cache-Control: no-cache
+
+###

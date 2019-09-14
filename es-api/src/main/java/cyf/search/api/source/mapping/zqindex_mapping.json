@@ -1,0 +1,31 @@
+{
+  "zqindex": {
+    "mappings": {
+      "product": {
+        "properties": {
+          "createDate": {
+            "type": "date",
+            "format": "dateOptionalTime"
+          },
+          "description": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "onSale": {
+            "type": "boolean"
+          },
+          "price": {
+            "type": "double"
+          },
+          "title": {
+            "type": "string",
+            "store": true
+          },
+          "type": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

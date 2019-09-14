@@ -1,0 +1,33 @@
+{
+  "size": 0,
+  "aggs": {
+    "colors": {
+      "histogram": {
+        "field": "price",
+        "interval": 20000,
+        "order": {
+          "red_green_cars>stats.variance": "asc"
+        }
+      },
+      "aggs": {
+        "red_green_cars": {
+          "filter": {
+            "terms": {
+              "color": [
+                "red",
+                "green"
+              ]
+            }
+          },
+          "aggs": {
+            "stats": {
+              "extended_stats": {
+                "field": "price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
