@@ -41,5 +41,15 @@
       "sort": [
         { "account_number": "asc" }
       ]
-    }
+    }'
+   
+   curl -XGET '172.16.20.60:9200/ugcindex/tips/_search?pretty' -d'
+   {
+      "from":0,
+       "size":1,
+     "query": { "match_all": {} }
+     
+   }'
+   
+  
    ```     
