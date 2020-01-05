@@ -1,0 +1,428 @@
+
+GET /_cat/indices?v
+
+GET /_cat/nodes?v
+
+GET _cat/shards?v
+
+GET _cluster/settings
+
+GET _cat/plugins
+
+
+#settings及mappings
+GET movies
+
+#索引模糊查询
+GET /_cat/indices/.kibana*?v&s=index
+
+GET /_cat/indices?v&health=green
+
+#文档数倒叙
+GET /_cat/indices?v&s=docs.count:desc
+
+#前10条数据
+POST movies/_search
+
+
+#############crud #############
+
+#create
+
+PUT user/_doc/3
+{
+"city":"上海"
+}
+
+PUT user/_create/2
+{
+"name":"Taylor"
+}
+
+POST user/_doc/ZK4B5m4BqQ7IBHimtYAW
+{
+
+"name": "green"
+}
+
+POST user/_update/1
+{
+"name":"Eva"
+}
+
+DELETE user/_doc/ZK4B5m4BqQ7IBHimtYAW
+
+GET movies/_search
+{
+"size": 2,
+"query": {
+"match_all": {}
+}
+}
+
+# bulk
+POST _bulk
+{"index":{"_index":"user","_id":3}}
+{"name": "Swift"}
+{"update":{"_index":"user","_id":2}}
+{"doc":{"city":"上海"}}
+
+#mget批量读取
+GET _mget
+{
+"docs":[
+{
+"_index":"user",
+"_id":2
+},
+{
+"_index":"movies",
+"_id":5222
+}
+
+]
+
+}
+
+#msearch
+GET _msearch
+{"index":"user"}
+{"query":{"match_all":{}},"size":2}
+{"index":"movies"}
+{"query":{"match_all":{}},"from":0,"size":2}
+
+#analyze
+GET _analyze
+{
+"analyzer": "icu_analyzer",
+"text":"她的确很漂亮"
+}
+
+
+#指定字段查询（两种方式）
+GET movies/_search?q=2012&df=title
+{
+"profile": "true"
+}
+
+GET user/_search?q=city:上
+{
+"profile": "true"
+}
+
+
+############# URL Search #############
+#phrase
+GET movies/_search?q=title:"Beautiful Mind"
+{
+"profile": "true"
+}
+
+#term
+GET movies/_search?q=title:(Beautiful Mind)
+{
+"profile": "true"
+}
+
+GET movies/_search?q=title:(Beautiful AND Mind)
+{
+"profile": "true"
+}
+
+GET movies/_search?q=title:(Beautiful %2BMind)
+{
+"profile": "true"
+}
+
+GET movies/_search?q=year:[* TO 2018]&sort=year:desc&size=50
+{
+"profile": "true"
+}
+
+GET movies/_search?q=year:{2016 TO 2017}&sort=year:desc&size=50
+{
+"profile": "true"
+}
+
+GET movies/_search?q=year:(>2010 AND <=2012)&sort=year:asc
+{
+"profile": "true"
+}
+
+
+GET movies/_search?q=title:beautif~2
+{
+"profile": "true"
+}
+
+GET movies/_search?q=title:"lord the"~2
+{
+"profile": "true"
+}
+
+############# reuqest body #############
+GET movies/_search
+{
+"query":{
+"match": {
+"title": {
+"query": "last christmas",
+"operator": "and"
+}
+
+}
+}
+}
+
+GET movies/_search
+{
+"query": {
+"match_phrase": {
+"title": "one love"
+}
+}
+}
+
+GET movies/_search
+{
+"query": {
+"match_phrase": {
+"title": {
+"query": "one love",
+"slop": 1
+}
+}
+}
+}
+
+################# query_string / simple_query_string ######
+GET movies/_search
+{
+"query": {
+"query_string": {
+"default_field": "title",
+"query": "lord AND rings"
+}
+}
+}
+
+GET movies/_search
+{
+"query": {
+"query_string": {
+"fields": ["title","genre"],
+"query": "(drama) AND (lord AND rings)"
+}
+},
+"profile": "true"
+}
+GET movies/_search
+{
+"query": {
+"simple_query_string": {
+"query": "",
+"fields": [],
+"default_operator": "OR"
+}
+}
+}
+
+################# dynamic mapping ##################
+PUT dynamic_m_test/_doc/1
+{
+"first_field":"Taylor"
+}
+
+GET dynamic_m_test/_mapping
+
+DELETE dynamic_m_test
+
+GET dynamic_m_test/_search
+
+
+POST dynamic_m_test/_mapping
+{
+"dynamic":"strict"
+}
+
+PUT dynamic_m_test/_doc/4
+{
+"lastest_field":"can"
+}
+
+################# index / null_value ##################
+
+DELETE users
+
+PUT users
+{
+"mappings": {
+"properties": {
+"first_name":{
+"type": "text",
+"copy_to": "full_name"
+},
+"last_name":{
+"type": "text",
+"copy_to": "full_name"
+},
+"mobile":{
+"type": "keyword",
+
+"null_value": "NULL"
+}
+}
+}
+}
+
+GET users/_mapping
+
+PUT users/_doc/1
+{
+"first_name":"Taylor",
+"last_name":"Swift",
+"mobile": null
+}
+
+GET users/_search
+{
+"query": {
+"match": {
+"full_name": "Taylor"
+}
+}
+}
+
+GET users/_search
+{
+"query": {
+"match": {
+"mobile": "NULL"
+}
+}
+}
+
+################# 多字段 自定义analyzer ##################
+DELETE product
+
+PUT product
+{
+"mappings": {
+"properties": {
+"name":{
+"type": "text",
+"fields": {
+"keyword":{
+"type": "keyword",
+"ignore_above": 256
+}
+}
+
+},
+"comment":{
+"type": "text",
+"fields": {
+"english_comment":{
+"type": "text",
+"analyzer": "english"
+}
+}
+}
+}
+}
+}
+
+GET product/_mapping
+
+GET _analyze
+{
+"char_filter": ["html_strip"],
+"tokenizer": "lowercase",
+"filter": ["stop"],
+"text":"<div> my love,The wife </div>"
+}
+
+GET _analyze
+{
+"tokenizer": "standard",
+"char_filter": [
+{
+"type":"pattern_replace",
+"pattern":"http://(.*)",
+"replacement":"$1"
+}
+],
+"text": ["http://www.elastic.co"]
+}
+
+GET _analyze
+{
+"tokenizer": {
+"type":"char_group",
+"tokenize_on_chars":[
+"punctuation"
+]
+},
+"text":"i'm fine,funny! what did you say"
+}
+
+################# index template ##################
+
+PUT _template/template_test
+{
+"index_patterns": ["test*"],
+"mappings":{
+"date_detection": false,
+"numeric_detection": true
+}
+}
+
+PUT test_index/_doc/1
+{
+"date": "2020-01-05",
+"age": "26"
+}
+
+GET test_index/_mapping
+
+DELETE my_test_index
+
+
+
+PUT my_test_index
+{
+"mappings": {
+"dynamic_templates": [
+{
+"integers": {
+"match_mapping_type": "long",
+"mapping": {
+"type": "integer"
+}
+}
+},
+{
+"strings": {
+"path_match": "name.*",
+"mapping": {
+"type": "text",
+"copy_to": "full_name"
+}
+}
+}
+]
+}
+}
+
+PUT my_test_index/_doc/1
+{
+"name":{
+"first": "cheng",
+"last": "yufei"
+}
+}
+
+GET my_test_index/_search?q=full_name:yuf~2
+{
+"profile": "true"
+}
