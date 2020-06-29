@@ -1,0 +1,770 @@
+GET _cat/indices?v&s=docs.count:desc
+
+DELETE .watcher-history-6-2020.06.19
+
+DELETE .monitoring-es-6-2020.06.19
+
+
+##禁掉的索引监控信息将不会在Kibana页面中Montioring模块中看到，比如在索引列表及索引监控信息页面
+PUT _cluster/settings
+{"persistent": {"xpack.monitoring.collection.indices": "*,-.*"}}
+
+##需要保留的天数，最少保留一天
+PUT _cluster/settings
+{"persistent": {"xpack.monitoring.history.duration":"1d"}}
+
+
+
+GET my_index/_mapping
+
+GET my_index2/_mapping
+
+get my_index2/my_type2/_search
+
+get my_index/my_type/_search
+
+post _bulk
+{"index":{"_index":"my_index","_type":"my_type","_id":3}}
+{"name":"candice","ctime":"2020-02-07"}
+{"index":{"_index":"my_index","_type":"my_type","_id":4}}
+{"name":"ariana","ctime":"2020-02-07"}
+
+post _bulk
+{"update":{"_index":"my_index","_type":"my_type","_id":3}}
+{"doc":{"ctime":"2020-02-06"}}
+
+get _mget
+{
+  "docs":[
+    {
+      "_index":"my_index",
+      "_type":"my_type",
+      "_id":3
+    },
+    {
+      "_index":"my_index2",
+      "_type":"my_type2",
+      "_id":2
+    }
+    ]
+}
+
+PUT movies
+
+POST movies/movies/_mapping
+{
+    "properties" : {
+        "@version" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "genre" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "id" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "title" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "year" : {
+          "type" : "long"
+        }
+      }
+}
+
+GET movies/logs/_mapping
+
+GET movies/logs/_search
+
+# 单词查询 默认 ：or
+GET movies/logs/_search?q=title:(good AND time)
+
+#短语查询
+GET movies/logs/_search?q=title:"good time"
+
+GET movies/logs/_search?q=year:{1996 TO 1997]
+
+#explain: 查看算分情况
+GET movies/logs/_search
+{
+  "explain": true,
+  "query": {
+    "query_string": {
+      "default_field": "title",
+      "query": "good AND time"
+    }
+  }
+}
+
+GET movies/logs/_search?q=genre:Comedy
+
+#boosting 对算分的影响
+GET movies/logs/_search
+{
+ "query": {
+
+    "boosting": {
+
+      "positive": {
+        "query_string": {
+          "default_field": "title",
+          "query": "good AND time"
+        }
+      },
+      "negative": {
+        "term": {
+          "year": 2017
+
+        }
+      },
+      "negative_boost": 0.4
+    }
+  }
+}
+
+
+####### analyzer start ##############
+GET _cat/plugins
+
+GET _analyze
+{
+  "tokenizer": "icu_tokenizer",
+  "text": "短语查询"
+}
+
+GET _analyze
+{
+  "analyzer": "ik_smart",
+  "text":"短语查询"
+}
+
+GET _analyze
+{
+  "char_filter": [
+    {
+      "type": "pattern_replace",
+      "pattern" :"http://(.*)",
+      "replacement":"$1"
+    }
+    ],
+    "tokenizer": "standard",
+    "text": "http://www.baidu.com"
+
+}
+
+GET _analyze
+{
+  "char_filter": [
+    {
+      "type": "html_strip"
+    }
+    ],
+    "tokenizer": "uax_url_email",
+    "text": "<div>http://www.baidu.com</div>"
+
+}
+
+GET _analyze
+{
+  "tokenizer": {
+    "type":"pattern",
+    "pattern":"[,， ]"
+  },
+    "text": "人, 感谢, 成功, 成功的 "
+}
+
+####### analyzer end ##############
+
+DELETE info
+
+GET info/_mappings
+
+POST info/_open
+
+#不规范
+PUT info
+{
+  "settings": {
+    "analysis": {
+          "analyzer": {
+            "comma": {
+              "type": "pattern",
+              "pattern":"[,，]"
+            },
+            "tag_analyzer": {
+              "lowercase": "true",
+              "pattern": "[,，;]",
+              "type": "pattern"
+            }
+          }
+        }
+  }
+}
+
+##规范
+PUT info
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "title_custom": {
+          "type": "custom",
+          "tokenizer": "comma"
+        },
+        "tag_custom":{
+          "type":"custom",
+          "tokenizer":"tag_analyzer"
+        }
+      },
+      "tokenizer": {
+        "comma": {
+          "type": "pattern",
+          "pattern": "[,， ]"
+        },
+        "tag_analyzer":{
+          "type":"pattern",
+          "pattern": "[,，;]"
+        }
+      }
+    }
+  }
+}
+
+POST info/info_img/_mapping
+{
+   "properties": {
+          "auditFlag": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "crawling": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||epoch_millis||yyyyMMddHHmmss"
+          },
+          "distinctId": {
+            "type": "keyword"
+          },
+          "id": {
+            "type": "keyword",
+            "index": false
+          },
+          "imgUrl": {
+            "type": "keyword"
+          },
+          "interests": {
+            "type": "text",
+            "fielddata": true
+          },
+          "isCrawling": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "keyword"
+          },
+          "tags": {
+            "type": "text",
+            "analyzer": "tag_custom"
+          },
+          "title": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "title_custom"
+          },
+          "type": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "updatedAt": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||epoch_millis||yyyyMMddHHmmss"
+          },
+          "url": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+}
+
+GET info/info_img/_search?sort=createdAt:desc
+
+GET info/info_img/_search
+{
+  "from": 0,
+  "size": 20,
+  "query": {
+    "exists":{
+      "field":"category"
+    }
+  }
+}
+
+GET _analyze
+{
+  "analyzer": "ik_smart",
+  "text": "房屋 交易大廳"
+}
+
+GET info/_analyze
+{
+  "analyzer": "title_custom",
+  "text": "人, 感谢, 成功, 成功的 "
+}
+
+GET info/info_img/_search
+{
+"profile":true,
+  "query": {
+    "query_string": {
+      "query": "房屋 交易大廳",
+      "fields": ["title"]
+    }
+  }
+}
+
+### 要求搜索词同时出现，most_fields + and 无结果
+GET info/info_img/_search
+{
+  "query": {
+    "multi_match": {
+      "type": "most_fields",
+      "query": "cross fire",
+      "operator":"and",
+      "fields": [ "type","category"]
+    }
+  }
+}
+
+### 要求搜索词同时出现，cross_fields + and 有结果
+GET info/info_img/_search
+{
+  "profile":true,
+  "query": {
+    "multi_match": {
+      "type": "cross_fields",
+      "query": "cross fire",
+      "operator":"and",
+      "fields": [ "type","category"]
+    }
+  }
+}
+
+GET info/info_img/_search
+{
+
+  "query": {
+    "multi_match": {
+      "type": "cross_fields",
+      "query": "房屋 交易大廳",
+     "operator":"and",
+      "fields": [ "category","type"]
+    }
+  }
+}
+
+
+
+POST info/info_img/4302074c-85c4-11e9-82cf-c4b3019bfa78/_update
+{
+  "doc": {
+    "title":"一起,cross",
+    "category":"fire",
+    "type":"cross"
+  }
+}
+
+GET info/info_img/48c36c66-85c4-11e9-82cf-c4b3019bfa78
+
+POST info/info_img/48c36c66-85c4-11e9-82cf-c4b3019bfa78/_update
+{
+  "doc": {
+    "category":"房屋",
+    "type":"交易大廳"
+  }
+}
+
+########################## blogs ##########################
+DELETE blogs
+PUT blogs
+
+POST _bulk
+{"index":{"_index":"blogs","_type":"dis_max","_id":1}}
+{"title":"Quick brown rabbits","body":"Brown rabbits a"}
+{"index":{"_index":"blogs","_type":"dis_max","_id":2}}
+{"title":"Kepping pets health","body":"quick brown fox"}
+
+#doc2 score < doc1 score
+GET blogs/dis_max/_search
+{
+
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "title": "brown fox"
+          }
+        },
+        {
+          "match": {
+            "body": "brown fox"
+          }
+        }
+      ]
+    }
+  }
+}
+
+#doc2 score【最佳匹配】 > doc1 score
+GET blogs/dis_max/_search
+{
+
+  "query": {
+    "dis_max": {
+      "queries": [
+         {"match": {
+           "title": "brown fox"
+           }
+         },
+         {
+           "match": {
+             "body": "brown fox"
+           }
+         }
+        ]
+    }
+  }
+}
+
+# 利用tie_breaker 来让包含搜索词的所有字段参与评分，否则两者的分一样【最高算分为最后得分】
+GET blogs/dis_max/_search
+{
+  "explain": true,
+  "query": {
+    "dis_max": {
+      "queries": [
+         {"match": {
+           "title": "quick pets"
+           }
+         },
+         {
+           "match": {
+             "body": "quick pets"
+           }
+         }
+        ],
+        "tie_breaker": 0.7
+    }
+  }
+}
+
+GET blogs/dis_max/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "pets brown",
+      "type": "cross_fields",
+      "operator":"and",
+      "fields": ["title","body"]
+    }
+  }
+}
+
+################  pinyin analize  ################
+
+GET _analyze
+{
+  "analyzer": "pinyin",
+  "text": ["周杰伦"]
+}
+
+################    alias  ################
+GET info/info_img/_search
+
+#查找index的别名
+GET info/_alias
+
+#查找别名为 alias开头的 index
+GET _alias/alias*
+
+POST _aliases
+{
+  "actions": [
+    {
+      "remove": {
+        "index": "info",
+        "alias": "alias1"
+
+      }
+    }
+  ]
+}
+
+POST _aliases
+{
+  "actions": [
+    {
+      "remove": {
+        "index": "info",
+        "alias": "info_alias_1"
+      }
+    },
+    {
+      "add": {
+        "indices":["info","blogs"],
+        "alias": "alias1"
+      }
+    }
+  ]
+}
+
+
+## alias 名和已存在的 index名 相同时，命名命名同时删除index
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "info",
+        "alias": "blogs"
+      }
+    },
+    {
+      "remove_index":{"index":"blogs"}
+    }
+
+  ]
+}
+
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "info",
+        "alias": "alias2",
+        "routing": "2"
+      }
+    }
+  ]
+}
+
+
+DELETE info/_aliases/alias*
+
+PUT info/_aliases/alias_1
+{
+  "filter":{
+    "range": {
+      "createdAt": {
+        "gte": "2019-12-31 23:23:59",
+        "lte": "2020-01-31 23:23:59"
+      }
+    }
+  }
+}
+
+GET alias_1/_search
+
+PUT img
+{
+  "mappings": {
+    "ty":{
+      "properties": {
+        "year":{"type": "integer"}
+      }
+    }
+  },
+  "aliases": {
+    "2020": {
+      "filter": {
+        "term": {
+          "yaer": "2020"
+        }
+      }
+    }
+  }
+}
+
+############# term/phrase/completion/context suggest ##############
+GET _cat/indices?s=docs.count:desc
+
+DELETE t_p_suggest
+
+PUT t_p_suggest
+
+POST t_p_suggest/movie/_mapping
+{
+  "properties": {
+    "title":{
+      "type": "text",
+      "analyzer": "ik_smart",
+      "search_analyzer": "ik_smart",
+      "fields": {
+        "keyword":{
+          "type": "keyword"
+        },
+        "complete":{
+          "type": "completion"
+        }
+      }
+
+    },
+    "title_context":{
+      "type": "completion",
+          "contexts":{
+            "type":"category",
+            "name":"common_category"
+          }
+    },
+    "pubtime":{
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyyMMddHHmmss||yyyyMMdd||yyyy-MM-dd"
+    }
+  }
+}
+
+POST _bulk
+{"index":{"_index":"t_p_suggest","_type":"movie","_id":1}}
+{"title":"泰坦尼克号","pubtime":"1997-12-19"}
+{"index":{"_index":"t_p_suggest","_type":"movie","_id":2}}
+{"title":"霸王别姬","pubtime":"1993-01-01"}
+{"index":{"_index":"t_p_suggest","_type":"movie","_id":3}}
+{"title":"阿甘正传","pubtime":"1994-06-23"}
+{"index":{"_index":"t_p_suggest","_type":"movie","_id":4}}
+{"title":"盗梦空间","pubtime":"2010-09-01"}
+{"index":{"_index":"t_p_suggest","_type":"movie","_id":5}}
+{"title":"股市投资稳赚不赔必修课：如何做好仓位管理和情绪管理","pubtime":"2010-09-01"}
+
+
+POST _bulk
+{"update":{"_index":"t_p_suggest","_type":"movie","_id":1}}
+{"doc":{"title_context":{"input":["泰坦尼克号"],"contexts":{"common_category":"movie"}}}}
+{"update":{"_index":"t_p_suggest","_type":"movie","_id":4}}
+{"doc":{"title_context":{"input":["盗梦空间"],"contexts":{"common_category":"movie"}}}}
+{"update":{"_index":"t_p_suggest","_type":"movie","_id":5}}
+{"doc":{"title_context":{"input":["泰坦,股市投资稳赚不赔必修课：如何做好仓位管理和情绪管理"],"contexts":{"common_category":"stock"}}}}
+
+
+GET t_p_suggest/_search
+
+GET _analyze
+{
+  "text": "仓位管理和情绪管理",
+  "analyzer": "ik_smart"
+}
+
+GET _analyze
+{
+  "text": "空间大",
+  "analyzer": "ik_smart"
+}
+
+GET t_p_suggest/_analyze
+{
+  "field": "title",
+  "text": "股市投资稳赚不赔必修课：如何做好仓位管理和情绪管理"
+}
+
+############## term 提示建议 ##############
+GET t_p_suggest/_search
+{
+  "suggest":{
+    "my_sugg":{
+      "text":"空 空大 股市 股票 稳赚管理 稳赚不",
+      "term":{
+        "field":"title",
+        "suggest_mode":"always",
+        "min_word_length":4,
+        "analyzer":"whitespace"
+
+      }
+    }
+  }
+}
+
+############## 自动补全 ##############
+GET t_p_suggest/_search
+{
+  "suggest":{
+    "auto_complete":{
+      "prefix":"盗",
+      "completion":{
+        "field":"title.complete"
+      }
+    }
+  }
+}
+
+############## 根据上下文补全 ##############
+GET t_p_suggest/_search
+{
+  "suggest":{
+    "my_sug":{
+      "prefix":"泰",
+      "completion":{
+        "field":"title_context",
+        "contexts":{
+          "common_category":"stock"
+        }
+
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
