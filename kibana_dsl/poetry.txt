@@ -1,0 +1,124 @@
+################## 诗句 ############
+GET _ingest/pipeline
+
+DELETE _ingest/pipeline/indexed_at
+DELETE _ingest/pipeline/time
+
+PUT _ingest/pipeline/indexed_at
+{
+  "description": "Adds timestamp  to documents",
+  "processors": [
+    {
+      "set": {
+        "field": "timestamp",
+        "value": "2020-08-08T14:33:23.372112Z"
+      }
+    },
+
+    {
+      "script": {
+        "source": "ctx.cont_length = ctx.contents.length();"
+      }
+    },
+    {
+  "script": { "lang": "painless",
+    "source": """ ZonedDateTime zdt = ZonedDateTime.parse(ctx.timestamp);
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    String datetime = zdt.format(dtf); ctx.timestamp = datetime; """
+
+  }
+}
+  ]
+}
+
+PUT _ingest/pipeline/time
+{
+  "description": " add time",
+  "processors": [
+     {
+      "set": {
+        "field": "timestamp",
+        "value": "2020-08-08T14:33:23.372112Z"
+      }
+    },
+   {
+      "date" : {
+        "field" : "timestamp",
+        "formats" : ["yyyy-MM-dd HH:mm:ss"],
+        "timezone": "Asia/Shanghai"
+
+      }
+    }
+
+  ]
+}
+
+DELETE poetry
+
+PUT poetry
+{
+  "settings": {
+
+     "number_of_shards": 1
+  }
+}
+
+PUT poetry/A/_mapping
+{
+  "properties": {
+     "cont_length":{
+        "type":"long"
+      },
+      "author": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      },
+      "contents": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word",
+        "fielddata": true
+      },
+      "timestamp": {
+        "type": "text"
+
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      },
+      "type": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      }
+  }
+}
+
+GET poetry/A/9
+
+PUT poetry/A/9?pipeline=indexed_at
+{
+  "contents": "兰叶春葳蕤，桂华秋皎洁。欣欣此生意，自尔为佳节。谁知林栖者，闻风坐相悦。草木有本心，何求美人折？",
+    "type": "五言古诗",
+    "author": "张九龄",
+    "title": "感遇四首之二"
+}
