@@ -1,12 +1,18 @@
 package cyf.search.api.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import cyf.search.base.enums.IndexType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -14,9 +20,11 @@ import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.index.reindex.ScrollableHitSource;
 import org.elasticsearch.rest.RestStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,8 +41,10 @@ import java.util.List;
 public class ESIndexService {
 
 
-    @Resource
+    @Autowired
     private TransportClient client;
+    @Autowired
+    private Gson gson;
 
 
     public String sendTypeToIndex(String jsonData, String indexName, String typeName, String primaryKey) {
@@ -83,6 +94,29 @@ public class ESIndexService {
             log.error("删除数据失败，bulkFailures:{},searchFailures:{}", bulkFailures.toString(), searchFailures.toString());
             return "删除数据失败";
         }
+        return "success";
+    }
+
+    public String sendTypeToIndexForPoetry() throws IOException {
+        Resource resource = new PathMatchingResourcePatternResolver().getResource("classpath:kibana_dsl/300.json");
+        File file = resource.getFile();
+        String s = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+        JsonArray array = JsonParser.parseString(s).getAsJsonArray();
+        BulkRequestBuilder bulk = client.prepareBulk();
+        array.forEach(a->{
+            JsonObject object = a.getAsJsonObject();
+            IndexRequestBuilder builder = client.prepareIndex(IndexType.POETRY.getIndex(), IndexType.POETRY.getType()).setId(object.get("id").getAsString())
+                    .setPipeline("index_at").setSource(object.toString(), XContentType.JSON);
+            bulk.add(builder);
+        });
+
+        BulkResponse responses = bulk.get();
+        if (responses.hasFailures()) {
+            log.error("根据id添加数据失败，msg:{}", responses.buildFailureMessage());
+            return "sendTypeToIndex: fail";
+        }
+        log.info("添加数据成功");
         return "success";
     }
 

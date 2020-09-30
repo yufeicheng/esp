@@ -5,9 +5,10 @@ import lombok.Getter;
 @Getter
 public enum IndexType {
 
-
+//
     kerr("miranda","kerr"),
 
+    POETRY("poetry", "A"),
     ;
 
     private String index;

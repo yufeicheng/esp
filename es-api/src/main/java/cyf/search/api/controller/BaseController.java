@@ -1,6 +1,7 @@
 package cyf.search.api.controller;
 
 import com.google.common.collect.Lists;
+import cyf.search.api.service.ESIndexService;
 import cyf.search.api.service.MatchService;
 import cyf.search.base.enums.IndexType;
 import cyf.search.base.model.Response;
@@ -23,12 +24,23 @@ import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.*;
+import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +71,8 @@ public class BaseController {
     private ElasticsearchTemplate elasticsearchTemplate;
     @Resource
     private MatchService matchService;
+    @Autowired
+    private ESIndexService indexService;
 
     @RequestMapping(value = "/saveAllKerr2")
     public Response saveAll() throws IOException {
@@ -204,4 +218,9 @@ public class BaseController {
 
     }
 
+    @GetMapping("/savePoetry")
+    public String savePoetry(@RequestParam Integer id) throws IOException {
+        indexService.sendTypeToIndexForPoetry();
+        return "success";
+    }
 }

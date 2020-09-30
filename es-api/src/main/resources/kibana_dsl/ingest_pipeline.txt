@@ -1,57 +1,55 @@
 ################## 诗句 ############
 GET _ingest/pipeline
 
-DELETE _ingest/pipeline/indexed_at
+DELETE _ingest/pipeline/index_at
 DELETE _ingest/pipeline/time
 
-PUT _ingest/pipeline/indexed_at
+PUT _ingest/pipeline/index_at
 {
   "description": "Adds timestamp  to documents",
   "processors": [
     {
       "set": {
-        "field": "timestamp",
-        "value": "2020-08-08T14:33:23.372112Z"
+        "field": "time",
+        "value": "{{_ingest.timestamp}}"
       }
     },
-
+     {
+      "set": {
+        "field": "timestamp",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
     {
       "script": {
         "source": "ctx.cont_length = ctx.contents.length();"
       }
     },
-    {
+     {
   "script": { "lang": "painless",
-    "source": """ ZonedDateTime zdt = ZonedDateTime.parse(ctx.timestamp);
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String datetime = zdt.format(dtf); ctx.timestamp = datetime; """
+    "source": """
+    DateTimeFormatter ofPattern = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+		ZonedDateTime parse1 = ZonedDateTime.parse(ctx.time, ofPattern);
+
+		DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	String format = 	parse1.toInstant().atZone(ZoneId.of("Asia/Shanghai")).format(pattern);
+    ctx.time = format; """
 
   }
-}
-  ]
-}
-
-PUT _ingest/pipeline/time
-{
-  "description": " add time",
-  "processors": [
+     },
      {
-      "set": {
-        "field": "timestamp",
-        "value": "2020-08-08T14:33:23.372112Z"
-      }
-    },
-   {
       "date" : {
         "field" : "timestamp",
-        "formats" : ["yyyy-MM-dd HH:mm:ss"],
-        "timezone": "Asia/Shanghai"
-
+        "target_field": "timestamp_format",
+        "formats" : ["EEE MMM dd HH:mm:ss z yyyy"],
+        "locale": "ENGLISH"
       }
     }
 
   ]
 }
+
+##########################################################################################################################################################
 
 DELETE poetry
 
@@ -66,8 +64,17 @@ PUT poetry
 PUT poetry/A/_mapping
 {
   "properties": {
+    "id":{
+      "type": "integer"
+    },
+
      "cont_length":{
-        "type":"long"
+        "type":"integer"
+      },
+       "time": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+
       },
       "author": {
         "type": "text",
@@ -88,10 +95,7 @@ PUT poetry/A/_mapping
         "analyzer": "ik_max_word",
         "fielddata": true
       },
-      "timestamp": {
-        "type": "text"
 
-      },
       "title": {
         "type": "text",
         "fields": {
@@ -113,9 +117,7 @@ PUT poetry/A/_mapping
   }
 }
 
-GET poetry/A/9
-
-PUT poetry/A/9?pipeline=indexed_at
+PUT poetry/A/9?pipeline=index_at
 {
   "contents": "兰叶春葳蕤，桂华秋皎洁。欣欣此生意，自尔为佳节。谁知林栖者，闻风坐相悦。草木有本心，何求美人折？",
     "type": "五言古诗",

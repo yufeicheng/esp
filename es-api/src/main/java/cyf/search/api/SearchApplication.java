@@ -1,9 +1,11 @@
 package cyf.search.api;
 
+import com.google.gson.Gson;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.support.DefaultBeanNameGenerator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 
 /**
  * boot入口
@@ -20,5 +22,9 @@ public class SearchApplication {
                 .run(args);
     }
 
+    @Bean(name="gson")
+    public Gson initGson(){
+        return new Gson();
+    }
 
 }

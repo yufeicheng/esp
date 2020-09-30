@@ -7,7 +7,7 @@ spring:
   profiles.active: dev
   data:
     elasticsearch:
-      cluster-name: taylor
+      cluster-name: docker-cluster
       cluster-nodes: 39.106.118.71:9300
       repositories:
         enabled: true
