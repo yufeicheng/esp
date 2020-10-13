@@ -84,7 +84,6 @@ public class SuggestService {
 	 *
 	 * GET poetry/A/_search
 	 * {
-	 *
 	 *   "suggest":{
 	 *     "text":"清溪深不",
 	 *     "my_s":{
@@ -116,7 +115,8 @@ public class SuggestService {
 		generatorBuilder.minWordLength(1);
 
 		PhraseSuggestionBuilder phraseBuilder = SuggestBuilders.phraseSuggestion("contents").text(text).confidence(0f).highlight("<em>", "</em>")
-				//
+				//短语suggester使用候选生成器生成给定文本中每个术语的可能术语列表
+				//单个候选生成器类似于为文本中的每个单独术语调用的term suggest
 				.addCandidateGenerator(generatorBuilder);
 
 		SuggestBuilder suggestBuilder = new SuggestBuilder();
@@ -137,6 +137,73 @@ public class SuggestService {
 		return result;
 	}
 
+	/**
+	 *上下文提示：
+	 * 	 两种类型：category 或 geo
+	 *
+	 *mapping：
+	 *POST context_suggest/A/_mapping
+	 * {
+	 *   "properties": {
+	 *     "id": {
+	 *       "type": "integer"
+	 *     },
+	 *     "contents": {
+	 *       "type": "completion",
+	 *       "contexts": [
+	 *         {
+	 *           "name": "con_type",
+	 *           "type": "category"
+	 *         }
+	 *       ]
+	 *     }
+	 *   }
+	 * }
+	 *
+	 *插入数据：
+	 * PUT context_suggest/A/1
+	 * {
+	 *   "id":1,
+	 *   "contents":{
+	 *     "input":["长安一片月，万户捣衣声。秋风吹不尽，总是玉关情。何日平胡虏，良人罢远征？","镜湖三百里，菡萏发荷花。五月西施采，人看隘若耶。回舟不待月，归去越王家。"],
+	 *     "contexts":{
+	 *       "con_type":["poetry"]
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * PUT context_suggest/A/2
+	 * {
+	 *   "id":1,
+	 *   "contents":{
+	 *     "input":["长安街"],
+	 *     "contexts":{
+	 *       "con_type":["location"]
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * 搜索建议：
+	 * GET context_suggest/A/_search
+	 * {
+	 *   "suggest":{
+	 *     "my_context_sugg":{
+	 *       "prefix":"长安",
+	 *       "completion":{
+	 *         "field":"contents",
+	 *         "contexts":{
+	 *           "con_type":["poetry"]
+	 *         }
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 *
+	 *
+	 * @param text
+	 * @param category
+	 * @return
+	 */
 	public List<String> contextsSuggest(String text, String category) {
 
 		ArrayList<String> result = new ArrayList<>();
