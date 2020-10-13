@@ -51,6 +51,23 @@ Accept: application/json
 Cache-Control: no-cache
 
 ###
-GET {{url}}/base/getPoetry?id=1
+GET {{url}}/base/saveContextSuggest?id=3&input=长安城头头白乌，夜飞延秋门上呼。又向人家啄大屋，屋底达官走避胡&category=poetry
+Accept: application/json
+Cache-Control: no-cache
+
+
+###
+GET {{url}}/suggest/term?text=山水
+Accept: application/json
+Cache-Control: no-cache
+
+
+###
+GET {{url}}/suggest/phrase?text=清溪深不
+Accept: application/json
+Cache-Control: no-cache
+
+###
+GET {{url}}/suggest/context?text=长安&category=location
 Accept: application/json
 Cache-Control: no-cache
