@@ -9,6 +9,7 @@ public enum IndexType {
     kerr("miranda","kerr"),
 
     POETRY("poetry", "A"),
+    CONTEXT_SUGGEST("context_suggest", "A"),
     ;
 
     private String index;
