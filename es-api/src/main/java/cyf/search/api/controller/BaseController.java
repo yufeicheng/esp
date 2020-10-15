@@ -227,7 +227,11 @@ public class BaseController {
 
 	@GetMapping("/saveContextSuggest")
 	public String savePoetry(@RequestParam Integer id, @RequestParam String input, @RequestParam String category) throws IOException {
-		indexService.sendTypeToIndexForContextSuggest(id, input, category);
-		return "success";
+		return indexService.sendTypeToIndexForContextSuggest(id, input, category);
+	}
+
+	@GetMapping("/saveCollege")
+	public String saveCollege() throws IOException {
+		return indexService.sendTypeToIndexForCollege();
 	}
 }

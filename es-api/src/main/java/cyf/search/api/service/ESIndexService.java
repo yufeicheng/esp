@@ -2,11 +2,14 @@ package cyf.search.api.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import cyf.search.base.enums.IndexType;
+import cyf.search.base.model.template.College;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +17,7 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -27,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,6 +43,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -48,7 +54,12 @@ public class ESIndexService {
 	private TransportClient client;
 	@Autowired
 	private Gson gson;
+	@Autowired
+	private RestTemplate restTemplate;
+	@Autowired
+	private ObjectMapper objectMapper;
 
+	private static final String collegeUrl = "https://static-data.eol.cn/www/school/%s/info.json";
 
 	public String sendTypeToIndex(String jsonData, String indexName, String typeName, String primaryKey) {
 
@@ -163,6 +174,36 @@ public class ESIndexService {
 		IndexResponse indexResponse = builder.get();
 		RestStatus status = indexResponse.status();
 		System.out.println();
+		return "success";
+	}
+
+	public String sendTypeToIndexForCollege() throws IOException {
+		BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
+		Stream.iterate(4000, i -> ++i).limit(500).forEach(j -> {
+			String object = restTemplate.getForObject(String.format(collegeUrl, j), String.class);
+			if (StringUtils.isBlank(object) || object.equals("\"\"")) {
+				return;
+			}
+			try {
+				College college = objectMapper.readValue(object, College.class);
+				IndexRequest indexRequest = new IndexRequest(IndexType.COLLEGE.getIndex(), IndexType.COLLEGE.getType(), String.valueOf(college.getId()))
+						.source(objectMapper.writeValueAsString(college), XContentType.JSON);
+				bulkRequestBuilder.add(indexRequest);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		int numberOfActions = bulkRequestBuilder.numberOfActions();
+		if (numberOfActions ==0) {
+			log.info("无数据添加");
+			return "success";
+		}
+		BulkResponse responses = bulkRequestBuilder.get();
+		if (responses.hasFailures()) {
+			log.error("根据id添加数据失败，msg:{}", responses.buildFailureMessage());
+			return "sendTypeToIndex: fail";
+		}
+		log.info("添加数据成功，{}条", numberOfActions);
 		return "success";
 	}
 

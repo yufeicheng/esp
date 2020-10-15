@@ -71,3 +71,8 @@ Cache-Control: no-cache
 GET {{url}}/suggest/context?text=长安&category=location
 Accept: application/json
 Cache-Control: no-cache
+
+###
+GET {{url}}/base/saveCollege
+Accept: application/json
+Cache-Control: no-cache

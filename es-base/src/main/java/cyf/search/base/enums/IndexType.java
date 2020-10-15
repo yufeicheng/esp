@@ -10,6 +10,7 @@ public enum IndexType {
 
     POETRY("poetry", "A"),
     CONTEXT_SUGGEST("context_suggest", "A"),
+    COLLEGE("college", "A"),
     ;
 
     private String index;
