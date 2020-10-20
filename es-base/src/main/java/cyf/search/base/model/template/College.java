@@ -2,6 +2,7 @@ package cyf.search.base.model.template;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import cyf.search.base.config.DeserializeBoolean;
@@ -12,12 +13,15 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
  * @JsonProperty: 序列化和反序列化都使用指定的名称
  *
  * @JsonAlias: 指定的名称只用于反序列化（字符串转实体类时候），实体类转字符串时仍然使用字段名
+ *
+ * @JsonIgnoreProperties(ignoreUnknown = true):反序列化时，忽略不匹配字段
  *
  * @author Cheng Yufei
  * @create 2020-10-15 10:13
@@ -26,6 +30,7 @@ import java.util.Date;
 @Setter
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class College {
 
 	@JsonAlias("school_id")
@@ -75,4 +80,8 @@ public class College {
 	String school_site;
 	String phone;
 	String content;
+
+	Date testTimeDate;
+
+	LocalDateTime testTimeLocal;
 }
