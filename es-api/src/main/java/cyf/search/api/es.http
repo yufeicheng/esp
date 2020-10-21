@@ -76,3 +76,9 @@ Cache-Control: no-cache
 GET {{url}}/base/saveCollege
 Accept: application/json
 Cache-Control: no-cache
+
+
+###
+GET {{url}}/suggest/searchAfter?param=-2145916800000,A#173
+Accept: application/json
+Cache-Control: no-cache
