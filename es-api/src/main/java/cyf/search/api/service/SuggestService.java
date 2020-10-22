@@ -131,6 +131,21 @@ public class SuggestService {
 		return result;
 	}
 
+	/**
+	 * GET poetry/A/_search
+	 * {
+	 *   "suggest":{
+	 *     "my":{
+	 *       "prefix":"长安",
+	 *       "completion":{
+	 *         "field":"contents.content_completion"
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 * @param text
+	 * @return
+	 */
 	public List<String> completionSuggest(String text) {
 
 		ArrayList<String> result = new ArrayList<>();
@@ -199,6 +214,12 @@ public class SuggestService {
 	 *   }
 	 * }
 	 *
+	 * 南京航空航天大学（77）、江南大学（86）、东南大学（109）、中国矿业大学（110）、南京大学（111）、南京理工大学（112）、南京农业大学（113）、南京师范大（115）、河海大学（116）、中国药科大学（117）
+	 *
+	 *
+	 * 东南大学、中国矿业大学、河海大学、苏州大学（118）、常州工学院（148）
+	 *
+	 * 南京航空航天大学、江南大学、南京大学、南京理工大学、南京农业大学
 	 *
 	 * @param text
 	 * @param category

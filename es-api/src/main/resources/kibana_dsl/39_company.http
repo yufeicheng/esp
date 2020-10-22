@@ -1,0 +1,712 @@
+GET _cat/indices?v&s=docs.count:desc
+
+###
+DELETE _ingest/pipeline/xpack_monitoring_2
+
+###
+GET _ingest/pipeline
+
+###
+DELETE poetry
+###
+PUT poetry
+
+{
+  "settings": {
+    "analysis": {
+     "analyzer": {
+       "content_punc":{
+         "type":"custom",
+         "tokenizer":"con"
+       }
+     },
+     "tokenizer": {
+       "con":{
+          "type": "pattern",
+          "pattern": "[。，？！ ]"
+       }
+     }
+    }
+  }
+}
+###
+POST poetry/A/_mapping
+
+{
+  "properties": {
+    "id":{
+      "type": "keyword"
+    },
+    "cont_length":{
+        "type":"long"
+      },
+      "author": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      },
+      "contents": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          },
+          "content_completion":{
+            "type": "completion"
+          },
+          "content_punc":{
+            "type": "text",
+            "analyzer": "content_punc"
+          }
+
+
+        },
+        "analyzer": "ik_max_word"
+      },
+      "time": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      },
+      "type": {
+        "type": "text",
+        "fields": {
+          "field": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "ik_max_word"
+      }
+  }
+}
+
+###
+GET poetry/_analyze
+
+{
+  "field": "contents",
+  "text": "清溪深不测"
+}
+GET poetry/_analyze
+{
+  "field": "author",
+  "text": "李白"
+}
+
+###
+GET _analyze
+
+{
+  "analyzer": "ik_smart",
+  "text": "http://www.gotopku.cn"
+}
+
+###
+GET poetry/A/_search
+
+{
+  "query": {
+    "prefix": {
+      "contents": {
+        "value": "天地"
+      }
+    }
+  }
+}
+
+###
+GET poetry/A/_search
+
+{
+  "query": {
+    "query_string": {
+      "default_field": "contents",
+      "query": "茅屋 花朵"
+    }
+  }
+}
+
+###
+GET poetry/A/_search
+
+{
+  "suggest":{
+    "my_s":{
+      "text":"清溪深不",
+      "term":{
+        "size":10,
+        "suggest_mode":"missing",
+        "field":"contents",
+        "min_word_length":1
+
+      }
+    }
+  }
+}
+
+###
+GET poetry/A/_search
+
+{
+
+  "suggest":{
+    "text":"清溪深不",
+    "my_s":{
+      "phrase":{
+        "max_errors": 7,
+        "confidence": 0,
+        "field":"contents",
+          "highlight": {
+          "pre_tag": "<em>",
+          "post_tag": "</em>"
+        }
+      }
+    }
+  }
+}
+###
+GET poetry/A/_search
+
+{
+
+  "suggest":{
+    "text":"清溪深不",
+    "my_s":{
+      "phrase":{
+        "max_errors": 7,
+        "confidence": 0,
+        "field":"contents",
+          "highlight": {
+          "pre_tag": "<em>",
+          "post_tag": "</em>"
+        }
+        ,
+         "direct_generator": [ {
+          "field": "contents",
+          "suggest_mode": "missing",
+          "min_word_length":1
+        } ]
+      }
+    }
+  }
+}
+###
+GET {{url}}/poetry/A/_search
+
+{
+  "suggest":{
+    "my":{
+      "prefix":"长安",
+      "completion":{
+        "field":"contents.content_completion"
+      }
+    }
+  }
+}
+###
+DELETE context_suggest
+###
+PUT context_suggest
+###
+POST context_suggest/A/_mapping
+
+{
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "contents": {
+      "type": "completion",
+      "contexts": [
+        {
+          "name": "con_type",
+          "type": "category"
+        }
+      ]
+    }
+  }
+}
+###
+PUT context_suggest/A/1
+
+{
+  "id":1,
+  "contents":{
+    "input":["长安一片月，万户捣衣声。秋风吹不尽，总是玉关情。何日平胡虏，良人罢远征？","镜湖三百里，菡萏发荷花。五月西施采，人看隘若耶。回舟不待月，归去越王家。"],
+    "contexts":{
+      "con_type":["poetry"]
+    }
+  }
+}
+###
+PUT context_suggest/A/2
+
+{
+  "id":1,
+  "contents":{
+    "input":["长安街"],
+    "contexts":{
+      "con_type":["location"]
+    }
+  }
+}
+
+###
+GET context_suggest/A/_search
+
+{
+  "suggest":{
+    "my_context_sugg":{
+      "prefix":"长安",
+      "completion":{
+        "field":"contents",
+        "contexts":{
+          "con_type":["poetry"]
+        }
+      }
+    }
+  }
+}
+###
+POST college/A/_bulk
+
+{"delete":{"_id":30}}
+{"delete":{"_id":31}}
+
+###
+DELETE college
+###
+PUT college
+
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "short_ana":{
+          "type":"custom",
+          "tokenizer":"short"
+        },
+        "email_ana":{
+          "type":"custom",
+          "tokenizer":"email"
+        }
+      },
+      "tokenizer": {
+        "short":{
+          "type": "pattern",
+          "pattern": "[,]"
+        },
+        "email":{
+          "type": "uax_url_email"
+        }
+      }
+    }
+  }
+}
+###
+POST college/A/_mapping
+
+{
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "fields": {
+        "name_completion": {
+          "type": "completion"
+        }
+      }
+    },
+    "type_code": {
+      "type": "integer"
+    },
+    "type_name": {
+      "type": "keyword"
+    },
+    "school_type_code": {
+      "type": "integer"
+    },
+    "school_type_name": {
+      "type": "keyword"
+    },
+    "school_nature_code": {
+      "type": "integer"
+    },
+    "school_nature_name": {
+      "type": "keyword"
+    },
+    "level_code": {
+      "type": "integer"
+    },
+    "level_name": {
+      "type": "keyword"
+    },
+    "dual_class_code": {
+      "type": "integer"
+    },
+    "dual_class_name": {
+      "type": "keyword"
+    },
+    "belong": {
+      "type": "keyword"
+    },
+    "f985": {
+      "type": "boolean"
+    },
+    "f211": {
+      "type": "boolean"
+    },
+    "num_subject": {
+      "type": "integer"
+    },
+    "num_master": {
+      "type": "integer"
+    },
+    "num_doctor": {
+      "type": "integer"
+    },
+    "num_academician": {
+      "type": "integer"
+    },
+    "num_library": {
+      "type": "integer"
+    },
+    "num_lab": {
+      "type": "integer"
+    },
+    "province_id": {
+      "type": "integer"
+    },
+    "province_name": {
+      "type": "keyword",
+      "copy_to": "full_name"
+    },
+    "city_id": {
+      "type": "integer"
+    },
+    "city_name": {
+      "type": "keyword",
+      "copy_to": "full_name"
+    },
+    "county_id": {
+      "type": "integer"
+    },
+    "town_name": {
+      "type": "keyword",
+      "copy_to": "full_name"
+    },
+    "full_name": {
+      "type": "text",
+      "analyzer": "ik_smart"
+    },
+    "create_date": {
+      "type": "date",
+      "format": "yyyy"
+    },
+    "area": {
+      "type": "float"
+    },
+    "shortV": {
+      "type": "text",
+      "analyzer": "short_ana"
+    },
+    "email": {
+      "type": "text",
+      "analyzer": "email_ana"
+    },
+    "address": {
+      "type": "text",
+      "analyzer": "ik_smart"
+    },
+    "postcode": {
+      "type": "integer"
+    },
+    "site": {
+      "type": "text",
+      "analyzer": "email_ana"
+    },
+    "school_site": {
+      "type": "text",
+      "analyzer": "email_ana"
+    },
+    "phone": {
+      "type": "text",
+      "analyzer": "short_ana"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "ik_smart"
+    }
+  }
+}
+###
+PUT college/A/_mapping
+
+{
+  "dynamic":"strict"
+}
+
+###
+ GET college/A/_mapping
+
+
+###
+ GET college/A/_search?sort=id:desc
+
+
+###
+ GET college/_analyze
+
+{
+  "field": "shortV",
+  "text":"忻州师院"
+}
+
+###
+ GET {{url}}/_analyze
+
+{
+  "analyzer": "ik_smart",
+  "text":"忻州示范"
+}
+###
+GET {{url}}/college/A/_search?q=provice_name:江苏
+
+###
+GET {{url}}/college/A/_search
+
+{
+  "query": {
+    "query_string": {
+      "fields": ["province_name"],
+      "query": "江苏"
+    }
+  }
+}
+###
+GET {{url}}/college/A/_search
+
+{
+  "query": {
+    "match": {
+      "name": {
+        "query": "忻州师范",
+        "operator": "and"
+      }
+    }
+  }
+}
+###
+GET {{url}}/college/A/_search
+
+{
+  "suggest":{
+    "text":"忻州yu",
+    "my_sug":{
+      "term":{
+        "field":"shortV",
+        "min_word_length":1
+      }
+    }
+  }
+}
+###
+GET {{url}}/college/A/_search
+
+{
+  "suggest":{
+    "my_sug":{
+      "prefix":"成都",
+      "completion":{
+	        "field":"name.name_completion"
+	    }
+    }
+  }
+}
+###
+GET {{url}}/college/A/_search
+
+{
+  "size": 10,
+ "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "create_date": {
+              "value": 0
+            }
+          }
+        }
+      ],
+      "filter": {
+        "term": {
+          "province_id": 32
+        }
+      }
+    }
+  },
+  "sort": [
+    {
+      "create_date": "asc"
+    },
+    {
+      "_uid":"asc"
+    }
+  ]
+}
+
+###
+GET {{url}}/college/A/_search
+
+{
+  "size": 10,
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "create_date": {
+              "value": 0
+            }
+          }
+        }
+      ],
+      "filter": {
+        "term": {
+          "province_id": 32
+        }
+      }
+    }
+  },
+  "search_after":["-1767225600000","A#1542"],
+  "sort": [
+    {
+      "create_date": "asc"
+    },
+    {
+      "_uid": "asc"
+    }
+  ]
+}
+###
+GET {{url}}/_nodes/stats/indices/search
+
+###
+GET {{url}}/college/A/_search
+
+{
+  "size": 10,
+  "query": {
+    "term": {
+      "province_id": 32
+    }
+  },
+  "sort": [
+    {
+      "id": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+###
+GET {{url}}/college/A/_search?scroll=1m
+
+{
+  "size": 5,
+  "query": {
+    "term": {
+      "province_id": 32
+    }
+  },
+  "sort": [
+    {
+      "id": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+###
+GET {{url}}/college/A/_search?scroll=1m
+
+{
+  "size": 5,
+  "slice":{
+    "id":0,
+    "max":2
+  },
+  "query": {
+    "term": {
+      "province_id": 32
+    }
+  },
+  "sort": [
+    {
+      "id": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+###
+GET {{url}}/_search/scroll
+
+{
+  "scroll":"1m",
+  "scroll_id":"DnF1ZXJ5VGhlbkZldGNoBQAAAAAABj8vFnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY_MxZ5SktkRmpkT1NFNnYtMWtDcHBHTlFnAAAAAAAGPzAWeUpLZEZqZE9TRTZ2LTFrQ3BwR05RZwAAAAAABj8xFnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY_MhZ5SktkRmpkT1NFNnYtMWtDcHBHTlFn"
+}
+###
+GET {{url}}/college/A/_search?scroll=1m
+
+{
+  "size": 5,
+  "slice":{
+    "id":1,
+    "max":2
+  },
+  "query": {
+    "term": {
+      "province_id": 32
+    }
+  },
+  "sort": [
+    {
+      "id": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+###
+GET {{url}}/_search/scroll
+
+{
+  "scroll":"1m",
+  "scroll_id":"DnF1ZXJ5VGhlbkZldGNoBQAAAAAABj-cFnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY_oBZ5SktkRmpkT1NFNnYtMWtDcHBHTlFnAAAAAAAGP50WeUpLZEZqZE9TRTZ2LTFrQ3BwR05RZwAAAAAABj-eFnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY_nxZ5SktkRmpkT1NFNnYtMWtDcHBHTlFn"
+}
+
+DELETE /_search/scroll
+{
+    "scroll_id" : [
+      "DnF1ZXJ5VGhlbkZldGNoBQAAAAAABj13FnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY9exZ5SktkRmpkT1NFNnYtMWtDcHBHTlFnAAAAAAAGPXgWeUpLZEZqZE9TRTZ2LTFrQ3BwR05RZwAAAAAABj15FnlKS2RGamRPU0U2di0xa0NwcEdOUWcAAAAAAAY9ehZ5SktkRmpkT1NFNnYtMWtDcHBHTlFn"
+    ]
+}
+
+DELETE /_search/scroll/_all
