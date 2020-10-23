@@ -18,6 +18,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.slice.SliceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,76 @@ public class SearchAfterAndScrollService {
 
 	/**
 	 * 避免文档有相同的sort value，加入 _uid 【每条文档有唯一的值】
+	 *
+	 * 首次请求：
+	 *
+	 * GET college/A/_search
+	 * {
+	 *   "size": 10,
+	 *   "query": {
+	 *     "bool": {
+	 *       "must_not": [
+	 *         {
+	 *           "term": {
+	 *             "create_date": {
+	 *               "value": 0
+	 *             }
+	 *           }
+	 *         }
+	 *       ],
+	 *       "filter": {
+	 *         "term": {
+	 *           "province_id": 32
+	 *         }
+	 *       }
+	 *     }
+	 *   },
+	 *   "search_after":["-1767225600000","A#1542"],
+	 *   "sort": [
+	 *     {
+	 *       "create_date": "asc"
+	 *     },
+	 *     {
+	 *       "_uid": "asc"
+	 *     }
+	 *   ]
+	 * }
+	 *
+	 * 之后请求：
+	 *
+	 * {
+	 *   "size": 10,
+	 *   "query": {
+	 *     "bool": {
+	 *       "must_not": [
+	 *         {
+	 *           "term": {
+	 *             "create_date": {
+	 *               "value": 0
+	 *             }
+	 *           }
+	 *         }
+	 *       ],
+	 *       "filter": {
+	 *         "term": {
+	 *           "province_id": 32
+	 *         }
+	 *       }
+	 *     }
+	 *   },
+	 *   "search_after":["-1767225600000","A#1542"],
+	 *   "sort": [
+	 *     {
+	 *       "create_date": "asc"
+	 *     },
+	 *     {
+	 *       "_uid": "asc"
+	 *     }
+	 *   ]
+	 * }
+	 *
+	 *
+	 *
 	 * @param searchAfterParam
 	 * @return
 	 */
@@ -77,6 +148,33 @@ public class SearchAfterAndScrollService {
 
 	/**
 	 * 不用于实时请求，用于大量数据处理，eg：reindex
+	 *
+	 * 首次：
+	 * GET college/A/_search?scroll=1m
+	 * {
+	 *   "size": 5,
+	 *   "query": {
+	 *     "term": {
+	 *       "province_id": 32
+	 *     }
+	 *   },
+	 *   "sort": [
+	 *     {
+	 *       "id": {
+	 *         "order": "asc"
+	 *       }
+	 *     }
+	 *   ]
+	 * }
+	 *
+	 * 之后：
+	 *
+	 * GET _search/scroll
+	 * {
+	 *   "scroll":"1m",
+	 *   "scroll_id":""
+	 * }
+	 *
 	 * @param scrollId
 	 * @return
 	 * @throws ExecutionException
@@ -95,6 +193,7 @@ public class SearchAfterAndScrollService {
 		TermQueryBuilder termQuery = QueryBuilders.termQuery("province_id", 32);
 		SearchRequestBuilder requestBuilder = client.prepareSearch(IndexType.COLLEGE.getIndex()).setTypes(IndexType.COLLEGE.getType())
 				.setScroll("1m")
+				//.slice(new SliceBuilder(0,2))
 				.setQuery(termQuery)
 				.setSize(5)
 				.addSort("id", SortOrder.ASC);
