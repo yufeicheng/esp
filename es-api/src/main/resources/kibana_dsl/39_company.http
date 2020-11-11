@@ -1,10 +1,10 @@
-GET _cat/indices?v&s=docs.count:desc
+GET {{url}}/_cat/indices?v&s=docs.count:desc
 
 ###
 DELETE _ingest/pipeline/xpack_monitoring_2
 
 ###
-GET _ingest/pipeline
+GET {{url}}/_ingest/pipeline
 
 ###
 DELETE poetry
@@ -93,20 +93,22 @@ POST poetry/A/_mapping
 }
 
 ###
-GET poetry/_analyze
+GET {{url}}/poetry/_analyze
 
 {
   "field": "contents",
   "text": "清溪深不测"
 }
-GET poetry/_analyze
+###
+GET {{url}}/poetry/_analyze
+
 {
   "field": "author",
   "text": "李白"
 }
 
 ###
-GET _analyze
+GET {{url}}/_analyze
 
 {
   "analyzer": "ik_smart",
@@ -114,7 +116,7 @@ GET _analyze
 }
 
 ###
-GET poetry/A/_search
+GET {{url}}/poetry/A/_search
 
 {
   "query": {
@@ -127,13 +129,13 @@ GET poetry/A/_search
 }
 
 ###
-GET poetry/A/_search
+GET {{url}}/poetry/A/_search
 
 {
   "query": {
     "query_string": {
       "default_field": "contents",
-      "query": "茅屋 花朵"
+      "query": "茅屋 AND 落叶"
     }
   }
 }

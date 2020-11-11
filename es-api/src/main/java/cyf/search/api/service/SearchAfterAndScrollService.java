@@ -70,7 +70,6 @@ public class SearchAfterAndScrollService {
 	 *       }
 	 *     }
 	 *   },
-	 *   "search_after":["-1767225600000","A#1542"],
 	 *   "sort": [
 	 *     {
 	 *       "create_date": "asc"
